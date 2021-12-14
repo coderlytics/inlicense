@@ -15,7 +15,7 @@ func main() {
 		Long:  `Generates the private and public key pair which get used to create and validate a license.`,
 		Run:   generateKeyPair,
 	}
-	var licCmd = &cobra.Command{Use: "lic [private key] [license config]",
+	var licCmd = &cobra.Command{Use: "lic [license config file] [private key]",
 		Short: "Generate a license file",
 		Long:  `Geneates the license file using the private key with the information from the license configuration.`,
 		Args:  cobra.MinimumNArgs(2),
