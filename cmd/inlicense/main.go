@@ -17,7 +17,7 @@ func main() {
 		Long:  `Generates the private and public key pair which get used to create and validate a license.`,
 		Run:   generateKeyPair,
 	}
-	var licCmd = &cobra.Command{Use: "lic [license config file] [private key]",
+	var licCmd = &cobra.Command{Use: "lic [license config file] [private key file]",
 		Short: "Generate a license file",
 		Long:  `Geneates the license file using the private key with the information from the license configuration.`,
 		Args:  cobra.MinimumNArgs(2),
@@ -47,7 +47,7 @@ func generateKeyPair(cmd *cobra.Command, args []string) {
 // generateLicense generates the license file using the private key and the license configuration file
 func generateLicense(cmd *cobra.Command, args []string) {
 	cfgFile := args[0]
-	privKey := args[1]
+	privKeyFile := args[1]
 
 	if _, err := os.Stat(cfgFile); errors.Is(err, os.ErrNotExist) {
 		println(fmt.Sprintf("Configuration file %s does not exist", cfgFile))
@@ -61,7 +61,19 @@ func generateLicense(cmd *cobra.Command, args []string) {
 		println(err.Error())
 	}
 
-	lic, err := internal.GenerateLicense(data, privKey)
+	if _, err := os.Stat(privKeyFile); errors.Is(err, os.ErrNotExist) {
+		println(fmt.Sprintf("Private key file %s does not exist", privKeyFile))
+		os.Exit(1)
+	}
+
+	privKey, err := ioutil.ReadFile(privKeyFile)
+
+	if err != nil {
+		println(fmt.Sprintf("Error reading file %s", privKey))
+		println(err.Error())
+	}
+
+	lic, err := internal.GenerateLicense(string(data), string(privKey))
 
 	if err != nil {
 		println("Unable to create license key")
